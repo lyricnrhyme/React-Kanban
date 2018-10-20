@@ -5,6 +5,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bp = require('body-parser');
+const methodOverride = require('method-override');
 
 app.use(cors());
 app.use(bp.json());
@@ -40,6 +41,39 @@ app.post('/add', (req, res) => {
     .save()
     .then( result => {
         console.log('serialize?', result);
+        res.json(result.serialize())
+    })
+    .catch( err => {
+        console.log('err', err)
+        res.json(err);
+    })
+})
+
+app.put('/edit', (req, res) => {
+    const { id } = req.params;
+    // const payload = {
+    //     author: req.body.author.trim(),
+    //     link: req.body.link.trim(),
+    //     description: req.body.description.trim()
+    // }
+
+    console.log('pls', req.body)
+    const payload = {
+        title: req.body.title,
+        body: req.body.body,
+        status_id: req.body.status,
+        priority_id: 1,
+        created_by: 1,
+        assigned_to: 1
+    }
+    console.log('payload', payload);
+    Card
+    .where({id})
+    .fetch()
+    .then( result => {
+        return result.save(payload)
+    })
+    .then( result => {
         res.json(result.serialize())
     })
     .catch( err => {
